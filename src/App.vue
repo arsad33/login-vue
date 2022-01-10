@@ -8,7 +8,7 @@
           <h2>QA/QC</h2>
         </div>
         <div class="form">
-          <form @submit="onClick" method="post">
+          <form @submit="onClick">
             <div class="name">
                 <label for="username">Username</label>
                 <input type="text" name="username" id="username" v-model="username">
@@ -35,7 +35,8 @@
 </template>
 
 <script>
-import axios from "axios";
+import { userService } from './userService';
+
 export default {
   data(){
     return{
@@ -44,10 +45,33 @@ export default {
     };
   },
   methods:{
-    onClick(){
-      axios.post("/", {username: this.username, password: this.password}).then(response =>{
-        console.log(response);
-      })
+    onClick(e){
+      e.preventDefault()
+      try {
+
+          var postResponse = userService.login(
+          {
+            username: this.username,
+            password: this.password,
+            application: "EMS",
+                deviceInfo: {
+                    macAddress: "1234",
+                    deviceType: "WINDOWS_TABLET",
+                    deviceVendor: "DELL",
+                    modelName: "xyz",
+                    osType: "windows",
+                    osVersion: "windows 10"
+                }
+          }
+         );
+         postResponse.then(response => {
+             console.log(response);
+             alert('Success : ' + response.data.data.jwtToken);
+         });
+       } catch {
+         alert('error');
+       }
+
     }
   }
 }
